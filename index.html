@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Bienvenue sur Convertisseur PDF Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      transition: opacity 0.8s ease;
+    }
+    .welcome-container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      max-width: 600px;
+      animation: fadeIn 1s ease-in-out;
+    }
+    h1 { font-size: 2.5rem; margin-bottom: 20px; animation: slideDown 1s ease-out; }
+    p { font-size: 1.2rem; margin-bottom: 30px; line-height: 1.6; animation: fadeInText 1.5s ease-in-out; }
+    button {
+      background: linear-gradient(135deg, #fff, #f0f0f0);
+      color: #6a11cb;
+      font-size: 1.2rem;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    button:hover { transform: scale(1.1); background: #fff; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+    footer {
+      margin-top: 30px;
+      color: #fff;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes fadeInText { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="welcome-container">
+    <h1>Bienvenue sur Convertisseur PDF !</h1>
+    <p>
+      J'ai créé cet outil simple pour vous aider à convertir facilement vos textes et images en fichiers PDF.
+      Que vous soyez étudiant, professionnel ou curieux, cet outil est rapide et intuitif.
+    </p>
+    <button id="startBtn">Commencer</button>
+  </div>
+
+  <footer>
+    &copy; 2025 KASSEM ANAKY DEKMAK | Email: kassem.dekmak@uvci.edu.ci | Abidjan, Cocody
+  </footer>
+
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    startBtn.addEventListener('click', () => {
+      // animation fade out
+      document.body.style.opacity = '0';
+      // attendre la fin de l'animation avant de rediriger
+      setTimeout(() => {
+        window.location.href = 'convertiseurV5.html';
+      }, 800); // correspond à transition opacity 0.8s
+    });
+  </script>
+</body>
+</html>

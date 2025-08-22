@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Convertisseur PDF Pro</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #fff;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 700px;
+      animation: fadeIn 1s ease-in-out;
+      position: relative;
+    }
+    header { text-align: center; margin-bottom: 25px; }
+    header h1 { font-size: 2.2rem; margin-bottom: 10px; color: #333; }
+    header p { font-size: 1rem; color: #555; }
+    textarea {
+      width: 100%; height: 180px; padding: 15px;
+      font-size: 16px; border-radius: 10px; border: 1px solid #ccc; resize: vertical;
+      transition: all 0.3s ease;
+    }
+    textarea:focus { border-color: #007bff; box-shadow: 0 0 8px rgba(0,123,255,0.3); outline: none; }
+    input[type="file"] {
+      margin: 15px 0; padding: 8px; border-radius: 8px;
+      border: 1px solid #ccc; width: 100%; transition: all 0.3s ease;
+    }
+    input[type="file"]:hover { border-color: #007bff; }
+    button {
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: white; font-size: 16px; padding: 12px 25px;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: all 0.3s ease; width: 100%; position: relative;
+    }
+    button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .loader {
+      display: none;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #007bff;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      animation: spin 1s linear infinite;
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    footer {
+      margin-top: 30px;
+      color: #fff;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Convertisseur PDF Pro</h1>
+      <p>Saisis ton texte ou importe une image / fichier texte pour générer un PDF</p>
+    </header>
+
+    <textarea id="textInput" placeholder="Écris ton texte ici..."></textarea>
+    <input type="file" id="fileInput" accept="image/*,.txt">
+    <button onclick="generatePDF()">Télécharger en PDF
+      <div class="loader" id="loader"></div>
+    </button>
+  </div>
+
+  <footer>
+    &copy; 2025 KASSEM ANAKY DEKMAK | Email: kassem.dekmak@uvci.edu.ci | Abidjan, Cocody
+  </footer>
+
+  <script>
+    function generatePDF() {
+      const loader = document.getElementById("loader");
+      loader.style.display = "inline-block";
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      let text = document.getElementById("textInput").value;
+      let file = document.getElementById("fileInput").files[0];
+
+      setTimeout(() => {
+        if (text) {
+          addTextToPDF(doc, text);
+          doc.save("document.pdf");
+        } else if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            if (file.type.startsWith("image/")) {
+              const img = new Image();
+              img.src = e.target.result;
+              img.onload = function() {
+                addImageToPDF(doc, img);
+                doc.save("image.pdf");
+              };
+            } else if (file.type === "text/plain") {
+              addTextToPDF(doc, e.target.result);
+              doc.save("texte.pdf");
+            } else {
+              alert("⚠️ Ce format n’est pas supporté (Word/Excel nécessitent Python côté serveur).");
+            }
+          };
+          if (file.type === "text/plain") reader.readAsText(file);
+          else reader.readAsDataURL(file);
+        } else {
+          alert("⚠️ Saisis du texte ou choisis un fichier !");
+        }
+        loader.style.display = "none";
+      }, 200);
+    }
+
+    function addTextToPDF(doc, text) {
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 10;
+      const maxWidth = pageWidth - margin * 2;
+      const lineHeight = 8;
+      const lines = doc.splitTextToSize(text, maxWidth);
+      let y = 20;
+      lines.forEach(line => {
+        if (y > pageHeight - margin) { doc.addPage(); y = 20; }
+        doc.text(line, margin, y);
+        y += lineHeight;
+      });
+    }
+
+    function addImageToPDF(doc, img) {
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const margin = 10;
+      const maxW = pageW - margin * 2;
+      const maxH = pageH - margin * 2;
+      let w = img.width, h = img.height;
+      const ratio = Math.min(maxW / w, maxH / h);
+      w *= ratio; h *= ratio;
+      doc.addImage(img, "PNG", margin, margin, w, h);
+    }
+  </script>
+</body>
+</html>

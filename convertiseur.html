@@ -17,11 +17,12 @@
       align-items: center;
       padding: 20px;
       color: #fff;
+      transition: opacity 0.8s ease;
     }
     .container {
       background: rgba(255, 255, 255, 0.95);
       color: #333;
-      padding: 30px 40px;
+      padding: 30px 20px;
       border-radius: 15px;
       box-shadow: 0 15px 40px rgba(0,0,0,0.2);
       width: 100%;
@@ -30,7 +31,7 @@
       position: relative;
     }
     header { text-align: center; margin-bottom: 25px; }
-    header h1 { font-size: 2.2rem; margin-bottom: 10px; color: #333; }
+    header h1 { font-size: 2rem; margin-bottom: 10px; color: #333; }
     header p { font-size: 1rem; color: #555; }
     textarea {
       width: 100%; height: 180px; padding: 15px;
@@ -47,7 +48,7 @@
       background: linear-gradient(135deg, #6a11cb, #2575fc);
       color: white; font-size: 16px; padding: 12px 25px;
       border: none; border-radius: 10px; cursor: pointer;
-      transition: all 0.3s ease; width: 100%; position: relative;
+      transition: all 0.3s ease; width: 100%; position: relative; margin-top: 10px;
     }
     button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
     .loader {
@@ -71,6 +72,12 @@
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media screen and (max-width: 500px) {
+      header h1 { font-size: 1.6rem; }
+      textarea { height: 150px; font-size: 14px; }
+      button { font-size: 14px; padding: 10px; }
+    }
   </style>
 </head>
 <body>
@@ -85,6 +92,7 @@
     <button onclick="generatePDF()">Télécharger en PDF
       <div class="loader" id="loader"></div>
     </button>
+    <button id="backBtn" style="background: #007bff; margin-top:15px;">Retour à l'accueil</button>
   </div>
 
   <footer>
@@ -92,6 +100,13 @@
   </footer>
 
   <script>
+    // Bouton Retour à l'accueil
+    const backBtn = document.getElementById('backBtn');
+    backBtn.addEventListener('click', () => {
+      document.body.style.opacity = '0';
+      setTimeout(() => { window.location.href = 'index.html'; }, 800);
+    });
+
     function generatePDF() {
       const loader = document.getElementById("loader");
       loader.style.display = "inline-block";
@@ -147,16 +162,24 @@
       });
     }
 
+    // --- Nouvelle fonction : images centrées et ratio conservé ---
     function addImageToPDF(doc, img) {
-      const pageW = doc.internal.pageSize.getWidth();
-      const pageH = doc.internal.pageSize.getHeight();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
       const margin = 10;
-      const maxW = pageW - margin * 2;
-      const maxH = pageH - margin * 2;
-      let w = img.width, h = img.height;
-      const ratio = Math.min(maxW / w, maxH / h);
-      w *= ratio; h *= ratio;
-      doc.addImage(img, "PNG", margin, margin, w, h);
+
+      let imgWidth = img.width;
+      let imgHeight = img.height;
+
+      const ratio = Math.min((pageWidth - 2*margin) / imgWidth, (pageHeight - 2*margin) / imgHeight);
+
+      imgWidth *= ratio;
+      imgHeight *= ratio;
+
+      const x = (pageWidth - imgWidth) / 2;
+      const y = (pageHeight - imgHeight) / 2;
+
+      doc.addImage(img, "PNG", x, y, imgWidth, imgHeight);
     }
   </script>
 </body>
